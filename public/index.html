@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>متجر المنتجات</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0b1a;
+  --card:rgba(255,255,255,.07);
+  --line:rgba(255,255,255,.14);
+  --a:#8b5cf6;
+  --b:#ec4899;
+  --c:#22d3ee;
+  --txt:#f1f1ff;
+  --muted:rgba(241,241,255,.7);
+}
+*{box-sizing:border-box}
+::selection{background:rgba(139,92,246,.45);color:#fff}
+::-moz-selection{background:rgba(139,92,246,.45);color:#fff}
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:'Cairo',system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--txt);
+  overflow-x:hidden;
+  padding:32px 20px 60px;
+}
+.blob{position:fixed;border-radius:50%;filter:blur(90px);opacity:.45;z-index:-1;animation:float 14s ease-in-out infinite;pointer-events:none}
+.b1{width:420px;height:420px;background:var(--a);top:-120px;right:-80px}
+.b2{width:380px;height:380px;background:var(--b);bottom:-100px;left:-60px;animation-delay:-5s}
+.b3{width:300px;height:300px;background:var(--c);top:45%;left:40%;animation-delay:-9s;opacity:.25}
+@keyframes float{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(40px,-50px) scale(1.15)}66%{transform:translate(-50px,30px) scale(.9)}}
+
+header{text-align:center;margin-bottom:28px;animation:down .8s cubic-bezier(.2,.9,.3,1.2) both}
+@keyframes down{from{opacity:0;transform:translateY(-40px)}to{opacity:1;transform:none}}
+
+.brand-wrapper{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+}
+.brand-icon-box{
+  width:50px;
+  height:50px;
+  border-radius:16px;
+  background:linear-gradient(135deg, rgba(34,211,238,.18), rgba(139,92,246,.25));
+  border:1px solid rgba(255,255,255,.18);
+  display:grid;
+  place-items:center;
+  box-shadow:0 8px 24px rgba(139,92,246,.3), inset 0 1px 1px rgba(255,255,255,.3);
+  animation:wob 3s ease-in-out infinite;
+  backdrop-filter:blur(8px);
+}
+@keyframes wob{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg) translateY(-3px)}}
+
+h1{
+  font-size:clamp(30px,6vw,52px);
+  font-weight:800;
+  margin:0;
+  background:linear-gradient(90deg,var(--c),var(--a),var(--b),var(--c));
+  background-size:300% 100%;
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  animation:shine 6s linear infinite;
+  display:inline-block;
+  line-height:1.2;
+}
+@keyframes shine{to{background-position:300% 0}}
+
+header p{
+  color:var(--muted);
+  margin:10px 0 0;
+  font-size:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+.sparkle-svg{color:var(--c);filter:drop-shadow(0 0 8px rgba(34,211,238,.6));display:inline-block;animation:spinSparkle 4s ease-in-out infinite}
+@keyframes spinSparkle{0%,100%{transform:scale(1) rotate(0deg)}50%{transform:scale(1.2) rotate(15deg)}}
+
+form{
+  max-width:440px;
+  margin:0 auto 16px;
+  background:var(--card);
+  border:1px solid var(--line);
+  backdrop-filter:blur(16px);
+  padding:22px;
+  border-radius:22px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  box-shadow:0 20px 60px rgba(0,0,0,.45);
+  animation:up .9s .15s cubic-bezier(.2,.9,.3,1.1) both;
+}
+@keyframes up{from{opacity:0;transform:translateY(50px) scale(.96)}to{opacity:1;transform:none}}
+
+input[type=text]{
+  background:rgba(0,0,0,.35);
+  border:1px solid var(--line);
+  color:var(--txt);
+  padding:13px 16px;
+  font:inherit;
+  border-radius:14px;
+  outline:none;
+  transition:.25s;
+}
+input[type=text]:focus{
+  border-color:var(--a);
+  box-shadow:0 0 0 4px rgba(139,92,246,.3);
+  transform:scale(1.01);
+}
+
+.drop{
+  position:relative;
+  border:2px dashed var(--line);
+  border-radius:18px;
+  min-height:140px;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  cursor:pointer;
+  overflow:hidden;
+  transition:.3s;
+  padding:18px 12px;
+  background:rgba(255,255,255,.02);
+}
+.drop:hover,.drop.over{
+  border-color:var(--c);
+  background:rgba(34,211,238,.07);
+  box-shadow:0 0 25px rgba(34,211,238,.2);
+  transform:scale(1.01);
+}
+.drop input{position:absolute;inset:0;opacity:0;cursor:pointer}
+
+.upload-icon-badge{
+  width:60px;
+  height:60px;
+  border-radius:18px;
+  background:linear-gradient(135deg, rgba(34,211,238,.15), rgba(139,92,246,.2));
+  border:1px solid rgba(255,255,255,.18);
+  display:grid;
+  place-items:center;
+  margin:0 auto 10px;
+  box-shadow:0 8px 20px rgba(139,92,246,.25);
+  transition:.3s;
+  animation:bob 2.4s ease-in-out infinite;
+}
+@keyframes bob{50%{transform:translateY(-6px)}}
+.drop:hover .upload-icon-badge{
+  transform:scale(1.1) translateY(-4px);
+  border-color:var(--c);
+  box-shadow:0 10px 25px rgba(34,211,238,.4);
+}
+.drop-text{
+  font-size:14px;
+  color:var(--muted);
+  font-weight:600;
+  transition:.25s;
+}
+.drop:hover .drop-text{color:var(--txt)}
+
+.drop img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:pop .5s both}
+@keyframes pop{from{opacity:0;transform:scale(1.3)}to{opacity:1;transform:none}}
+
+button{
+  position:relative;
+  overflow:hidden;
+  border:none;
+  color:#fff;
+  font:inherit;
+  font-weight:700;
+  font-size:16px;
+  padding:14px 20px;
+  border-radius:14px;
+  cursor:pointer;
+  background:linear-gradient(90deg,var(--a),var(--b));
+  background-size:200% 100%;
+  transition:.3s;
+  box-shadow:0 8px 24px rgba(139,92,246,.4);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+}
+button:hover{
+  background-position:100% 0;
+  transform:translateY(-3px) scale(1.01);
+  box-shadow:0 12px 30px rgba(236,72,153,.45);
+}
+button:active{transform:scale(.98)}
+button:disabled{opacity:.6;cursor:wait}
+
+.rip{position:absolute;border-radius:50%;background:#fff6;transform:scale(0);animation:rip .6s ease-out forwards;pointer-events:none}
+@keyframes rip{to{transform:scale(4);opacity:0}}
+
+.spin{
+  display:inline-block;
+  width:16px;
+  height:16px;
+  border:2px solid rgba(255,255,255,.3);
+  border-top-color:#fff;
+  border-radius:50%;
+  animation:sp .7s linear infinite;
+}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+#toast{
+  max-width:440px;
+  margin:0 auto 22px;
+  padding:0 16px;
+  height:0;
+  overflow:hidden;
+  border-radius:14px;
+  background:rgba(239,68,68,.14);
+  border:1px solid #ef4444;
+  color:#fecaca;
+  text-align:center;
+  opacity:0;
+  transition:.4s;
+}
+#toast.show{height:auto;padding:12px 16px;opacity:1;animation:shake .5s}
+@keyframes shake{20%{transform:translateX(-10px)}40%{transform:translateX(10px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:22px;
+  max-width:1020px;
+  margin:auto;
+}
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  backdrop-filter:blur(12px);
+  border-radius:20px;
+  overflow:hidden;
+  text-align:center;
+  transition:transform .35s cubic-bezier(.2,.9,.3,1.3),box-shadow .35s,border-color .35s;
+  animation:in .6s calc(var(--i)*80ms) cubic-bezier(.2,.9,.3,1.2) both;
+}
+@keyframes in{from{opacity:0;transform:translateY(40px) scale(.92)}to{opacity:1;transform:none}}
+.card:hover{
+  transform:translateY(-8px) scale(1.02);
+  border-color:rgba(139,92,246,.5);
+  box-shadow:0 20px 45px rgba(139,92,246,.35);
+}
+.card .im{height:190px;overflow:hidden;background:rgba(0,0,0,.35)}
+.card img{width:100%;height:100%;object-fit:cover;transition:transform .6s,opacity .6s;opacity:0}
+.card img.ok{opacity:1}
+.card:hover img{transform:scale(1.1)}
+.card p{margin:0;padding:14px 16px;font-weight:600;font-size:15px;line-height:1.4}
+
+.gone{
+  height:100%;
+  display:grid;
+  place-content:center;
+  gap:10px;
+  color:#fca5a5;
+  font-weight:600;
+  animation:pulse 1.6s ease-in-out infinite;
+}
+.gone-icon{
+  width:44px;
+  height:44px;
+  margin:0 auto;
+  border-radius:50%;
+  background:rgba(239,68,68,.18);
+  border:1px solid rgba(239,68,68,.3);
+  display:grid;
+  place-items:center;
+  color:#ef4444;
+}
+@keyframes pulse{50%{background:rgba(239,68,68,.15)}}
+
+.sk{
+  height:245px;
+  border-radius:20px;
+  background:linear-gradient(110deg,rgba(255,255,255,.05) 30%,rgba(255,255,255,.14) 50%,rgba(255,255,255,.05) 70%);
+  background-size:200% 100%;
+  animation:sh 1.2s linear infinite;
+}
+@keyframes sh{to{background-position:-200% 0}}
+
+.empty{
+  grid-column:1/-1;
+  text-align:center;
+  opacity:.8;
+  padding:50px 20px;
+  animation:up .6s both;
+}
+.empty-icon{
+  width:72px;
+  height:72px;
+  border-radius:22px;
+  background:linear-gradient(135deg, rgba(139,92,246,.15), rgba(34,211,238,.15));
+  border:1px solid rgba(255,255,255,.15);
+  display:grid;
+  place-items:center;
+  margin:0 auto 16px;
+  color:var(--c);
+  box-shadow:0 10px 30px rgba(139,92,246,.25);
+  animation:bob 2.4s ease-in-out infinite;
+}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important}}
+</style>
+</head>
+<body>
+
+<!-- Hidden SVG Gradients & Definitions -->
+<svg style="position:absolute;width:0;height:0;overflow:hidden;" aria-hidden="true">
+  <defs>
+    <linearGradient id="brandIconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="50%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#ec4899"/>
+    </linearGradient>
+    <linearGradient id="camIconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<div class="blob b1"></div>
+<div class="blob b2"></div>
+<div class="blob b3"></div>
+
+<header>
+  <div class="brand-wrapper">
+    <div class="brand-icon-box">
+      <!-- Modern Shopping Bag SVG Icon -->
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="url(#brandIconGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <path d="M16 10a4 4 0 0 1-8 0"/>
+      </svg>
+    </div>
+    <h1>متجر المنتجات</h1>
+  </div>
+  <p>
+    <span>ارفع منتجك وشوفه يظهر في ثانية</span>
+    <svg class="sparkle-svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 0L14.6 9.4L24 12L14.6 14.6L12 24L9.4 14.6L0 12L9.4 9.4L12 0Z"/>
+    </svg>
+  </p>
+</header>
+
+<form id="f">
+  <input type="text" name="name" placeholder="اسم المنتج" required>
+  <label class="drop" id="drop">
+    <div>
+      <div class="upload-icon-badge">
+        <!-- Modern Photo / Upload Camera SVG Icon -->
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="url(#camIconGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+          <circle cx="12" cy="13" r="4"/>
+        </svg>
+      </div>
+      <div class="drop-text">اسحب الصورة هنا أو اضغط للاختيار</div>
+    </div>
+    <input name="image" type="file" accept="image/*" required id="file">
+  </label>
+  <button id="btn">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 5v14M5 12h14"/>
+    </svg>
+    <span>أضف المنتج</span>
+  </button>
+</form>
+
+<div id="toast"></div>
+<div class="grid" id="grid"></div>
+
+<script>
+const $=s=>document.querySelector(s),grid=$('#grid'),toast=$('#toast'),btn=$('#btn'),drop=$('#drop'),file=$('#file');
+
+function skeleton(){
+  grid.innerHTML='<div class="sk"></div>'.repeat(3);
+}
+
+function esc(s){
+  return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+}
+
+async function load(){
+  skeleton();
+  try{
+    const items=await (await fetch('/api/products')).json();
+    await new Promise(r=>setTimeout(r,250));
+    if(!items.length){
+      grid.innerHTML=`<div class="empty">
+        <div class="empty-icon">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+            <path d="m3.3 7 8.7 5 8.7-5"/>
+            <path d="M12 22V12"/>
+          </svg>
+        </div>
+        <div>لسه مفيش منتجات... ضيف أول واحد!</div>
+      </div>`;
+      return;
+    }
+    grid.innerHTML=items.slice().reverse().map((p,i)=>`
+      <div class="card" style="--i:${i}">
+        <div class="im">
+          <img src="${p.image}" alt="${esc(p.name)}">
+        </div>
+        <p>${esc(p.name)}</p>
+      </div>
+    `).join('');
+
+    grid.querySelectorAll('img').forEach(img=>{
+      img.onload=()=>img.classList.add('ok');
+      img.onerror=()=>{
+        img.parentElement.innerHTML=`
+          <div class="gone">
+            <div class="gone-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+            </div>
+            <span>الصورة اختفت!</span>
+          </div>`;
+      };
+      if(img.complete&&img.naturalWidth)img.classList.add('ok');
+    });
+  }catch(e){
+    showErr('تعذر تحميل المنتجات: '+e.message);
+  }
+}
+
+function showErr(t){
+  toast.textContent=t;
+  toast.classList.remove('show');
+  void toast.offsetWidth;
+  toast.classList.add('show');
+}
+
+function preview(f){
+  if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    drop.querySelector('img')?.remove();
+    const i=new Image();
+    i.src=e.target.result;
+    drop.appendChild(i);
+  };
+  r.readAsDataURL(f);
+}
+
+file.addEventListener('change',()=>preview(file.files[0]));
+['dragenter','dragover'].forEach(e=>drop.addEventListener(e,()=>drop.classList.add('over')));
+['dragleave','drop'].forEach(e=>drop.addEventListener(e,()=>drop.classList.remove('over')));
+
+btn.addEventListener('click',e=>{
+  const r=document.createElement('span'),b=btn.getBoundingClientRect(),s=Math.max(b.width,b.height);
+  r.className='rip';
+  r.style.cssText=`width:${s}px;height:${s}px;left:${e.clientX-b.left-s/2}px;top:${e.clientY-b.top-s/2}px`;
+  btn.appendChild(r);
+  setTimeout(()=>r.remove(),600);
+});
+
+$('#f').addEventListener('submit',async e=>{
+  e.preventDefault();
+  toast.classList.remove('show');
+  btn.disabled=true;
+  btn.innerHTML='<span>جاري الرفع</span><span class="spin"></span>';
+  try{
+    const r=await fetch('/api/products',{method:'POST',body:new FormData(e.target)});
+    if(!r.ok){
+      const j=await r.json().catch(()=>({}));
+      showErr('حصل خطأ: '+(j.error||r.status));
+      return;
+    }
+    e.target.reset();
+    drop.querySelector('img')?.remove();
+    await load();
+  }catch(err){
+    showErr('حصل خطأ: '+err.message);
+  }finally{
+    btn.disabled=false;
+    btn.innerHTML=`
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 5v14M5 12h14"/>
+      </svg>
+      <span>أضف المنتج</span>`;
+  }
+});
+
+load();
+</script>
+</body>
+</html>
