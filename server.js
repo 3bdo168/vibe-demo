@@ -1,40 +1,55 @@
-// ⚠️ ده الكود "الغلطان" عن قصد — بنفس الطريقة اللي الـAI بيكتبه في الـvibe coding
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const { v2: cloudinary } = require('cloudinary');
+
+// ——— Cloudinary config ———
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 const app = express();
-const UPLOADS = path.join(__dirname, 'uploads');
-const DB_FILE = path.join(__dirname, 'products.json');
+app.use(express.json());
 
-if (!fs.existsSync(UPLOADS)) fs.mkdirSync(UPLOADS);
+const DB_FILE = path.join(__dirname, 'products.json');
 if (!fs.existsSync(DB_FILE)) fs.writeFileSync(DB_FILE, '[]');
 
-// الصور بتتحفظ جوه فولدر المشروع نفسه
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, UPLOADS),
-  filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname)),
-});
-const upload = multer({ storage });
+// multer يحفظ في الذاكرة بس (مش على الديسك) — كده يشتغل على Vercel
+const upload = multer({ storage: multer.memoryStorage() });
 
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(UPLOADS));
 
 app.get('/api/products', (req, res) => {
   res.json(JSON.parse(fs.readFileSync(DB_FILE, 'utf8')));
 });
 
-app.post('/api/products', upload.single('image'), (req, res) => {
-  const products = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
-  const product = {
-    id: Date.now(),
-    name: req.body.name,
-    image: '/uploads/' + req.file.filename, // مسار محلي على نفس السيرفر
-  };
-  products.push(product);
-  fs.writeFileSync(DB_FILE, JSON.stringify(products, null, 2));
-  res.json(product);
+app.post('/api/products', upload.single('image'), async (req, res) => {
+  try {
+    // رفع الصورة على Cloudinary من الـ buffer
+    const result = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: 'vibe-demo' },
+        (err, result) => (err ? reject(err) : resolve(result))
+      );
+      stream.end(req.file.buffer);
+    });
+
+    const products = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+    const product = {
+      id: Date.now(),
+      name: req.body.name,
+      image: result.secure_url, // لينك Cloudinary — مش مسار محلي
+    };
+    products.push(product);
+    fs.writeFileSync(DB_FILE, JSON.stringify(products, null, 2));
+    res.json(product);
+  } catch (err) {
+    console.error('Upload error:', err);
+    res.status(500).json({ error: 'فشل رفع الصورة' });
+  }
 });
 
 // تعامل مع أي error بشكل بسيط
