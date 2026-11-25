@@ -14,8 +14,26 @@ cloudinary.config({
 const app = express();
 app.use(express.json());
 
-const DB_FILE = path.join(__dirname, 'products.json');
-if (!fs.existsSync(DB_FILE)) fs.writeFileSync(DB_FILE, '[]');
+// في Vercel السيرفر Read-Only، فالكتابة في المسار الأصلي ممنوعة
+// بنستخدم /tmp لو إحنا على Vercel
+const os = require('os');
+const DB_FILE = process.env.VERCEL
+  ? path.join(os.tmpdir(), 'products.json')
+  : path.join(__dirname, 'products.json');
+
+// لو الملف مش موجود في /tmp بننقله أو بنعمله كـ فاضي
+if (!fs.existsSync(DB_FILE)) {
+  const seedFile = path.join(__dirname, 'products.json');
+  if (fs.existsSync(seedFile)) {
+    try {
+      fs.copyFileSync(seedFile, DB_FILE);
+    } catch {
+      fs.writeFileSync(DB_FILE, '[]');
+    }
+  } else {
+    fs.writeFileSync(DB_FILE, '[]');
+  }
+}
 
 // multer يحفظ في الذاكرة بس (مش على الديسك) — كده يشتغل على Vercel
 const upload = multer({ storage: multer.memoryStorage() });
@@ -23,7 +41,12 @@ const upload = multer({ storage: multer.memoryStorage() });
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/api/products', (req, res) => {
-  res.json(JSON.parse(fs.readFileSync(DB_FILE, 'utf8')));
+  try {
+    if (!fs.existsSync(DB_FILE)) return res.json([]);
+    res.json(JSON.parse(fs.readFileSync(DB_FILE, 'utf8')));
+  } catch (err) {
+    res.json([]);
+  }
 });
 
 app.post('/api/products', upload.single('image'), async (req, res) => {
@@ -37,18 +60,26 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
       stream.end(req.file.buffer);
     });
 
-    const products = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+    let products = [];
+    try {
+      if (fs.existsSync(DB_FILE)) {
+        products = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+      }
+    } catch {
+      products = [];
+    }
+
     const product = {
       id: Date.now(),
       name: req.body.name,
-      image: result.secure_url, // لينك Cloudinary — مش مسار محلي
+      image: result.secure_url, // لينك Cloudinary
     };
     products.push(product);
     fs.writeFileSync(DB_FILE, JSON.stringify(products, null, 2));
     res.json(product);
   } catch (err) {
     console.error('Upload error:', err);
-    res.status(500).json({ error: 'فشل رفع الصورة' });
+    res.status(500).json({ error: 'فشل رفع الصورة: ' + (err.message || 'خطأ غير معروف') });
   }
 });
 
